@@ -1,33 +1,13 @@
-using CareBridge.Api.Data;
 using CareBridge.Api.Services;
-using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Timeout;
 
+
+using CareBridge.Api.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
-
-var app = builder.Build();
-
-// app.UseDefaultFiles() - if someone requests the 'root' address
-// (e.g. just https://localhost:<port>/ with nothing after it),
-// automatically serve wwwroot/index.html, without them having to
-// type '/index.html' explicitly.
-app.UseDefaultFiles();
-
-// app.UseStaticFiles() - actually turns on the feature of serving
-// files from the wwwroot folder at all. Without this line,
-// requesting /index.html would return a 404 Not Found, even though
-// the file physically exists on disk.
-app.UseStaticFiles();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -74,7 +54,6 @@ builder.Services.AddDbContext<CareBridgeDbContext>(options =>
 var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(
     TimeSpan.FromSeconds(2),
     TimeoutStrategy.Optimistic);
-
 
 // ===================================================================
 // POLICY 2: RETRY WITH EXPONENTIAL BACKOFF
@@ -182,7 +161,6 @@ var circuitBreakerPolicy = HttpPolicyExtensions
             Console.WriteLine("[CIRCUIT BREAKER] HALF-OPEN - testing with next call.");
         });
 
-
 // ===================================================================
 // REGISTER THE TYPED HTTP CLIENT WITH POLLY POLICIES ATTACHED
 // ===================================================================
@@ -238,6 +216,20 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// app.UseDefaultFiles() - if someone requests the 'root' address
+// (e.g. just https://localhost:<port>/ with nothing after it),
+// automatically serve wwwroot/index.html, without them having to
+// type '/index.html' explicitly.
+app.UseDefaultFiles();
+
+// app.UseStaticFiles() - actually turns on the feature of serving
+// files from the wwwroot folder at all. Without this line,
+// requesting /index.html would return a 404 Not Found, even though
+// the file physically exists on disk.
+app.UseStaticFiles();
+
+
 
 if (app.Environment.IsDevelopment())
 {

@@ -1,27 +1,23 @@
-using CareBridge.Api.Data;
-using Microsoft.EntityFrameworkCore;
-
 var builder = WebApplication.CreateBuilder(args);
 
+// These three lines were already here from the project template.
+// AddControllers() enables the [ApiController] style we used above.
+// AddEndpointsApiExplorer() and AddSwaggerGen() together create the
+// interactive Swagger test page (the one with the green/blue buttons).
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // ===================================================================
-// REGISTER THE DATABASE CONTEXT
-// 'AddDbContext' tells ASP.NET Core: "whenever any piece of code asks
-// for a CareBridgeDbContext, create one for them, configured to talk
-// to SQL Server using the connection string we just defined in
-// appsettings.json (section 3.7)".
+// CORS CONFIGURATION
+// We define a named POLICY called "AllowAll" that permits requests
+// from ANY origin, using ANY HTTP method, with ANY headers.
 //
-// This is called DEPENDENCY INJECTION - you saw this pattern on Day 8
-// too. We are not creating the database connection ourselves anywhere
-// in our controller code; we just ASK for it, and ASP.NET Core hands
-// us a ready-to-use one.
+// SECURITY NOTE: "AllowAll" is intentionally permissive and is meant
+// ONLY for local training/demo use. A real production system would
+// restrict this to specific, known origins (e.g. only the hospital's
+// own front-end address).
 // ===================================================================
-builder.Services.AddDbContext<CareBridgeDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("CareBridgeDb")));
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -34,12 +30,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Only show the Swagger test page when running in Development mode
+// (this is the default when you run from Visual Studio).
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Activate the CORS policy we defined above. This MUST come before
+// UseAuthorization() and MapControllers() to take effect correctly.
 app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
