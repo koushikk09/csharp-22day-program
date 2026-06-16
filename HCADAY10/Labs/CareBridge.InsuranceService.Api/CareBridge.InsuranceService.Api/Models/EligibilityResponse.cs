@@ -25,3 +25,5 @@
         public string CheckedAtUtc { get; set; } = string.Empty;
     }
 }
+
+

@@ -1,4 +1,4 @@
-@CareBridge.InsuranceService.Api_HostAddress = http://localhost:5069
+@CareBridge.InsuranceService.Api_HostAddress = http://localhost:5265
 
 GET {{CareBridge.InsuranceService.Api_HostAddress}}/weatherforecast/
 Accept: application/json
